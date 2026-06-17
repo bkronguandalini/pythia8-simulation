@@ -293,6 +293,7 @@ pythia
 
 ## 10. Referências
 
+- [Miniconda Documetation](https://www.anaconda.com/docs/getting-started/miniconda/main)
 - [Site oficial do PYTHIA](https://pythia.org)
 - [Documentação do PYTHIA8](https://pythia.org/latest-manual/)
 - [Guia sobre o PYTHIA8 (PDF)](https://pythia.org/download/pdf/pythia8300.pdf)

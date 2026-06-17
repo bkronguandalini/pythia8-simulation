@@ -1,114 +1,114 @@
 # PYTHIA8 Tutorial
 
-> **Autor:** Bruno Kron Guandalini  
+> **Author:** Bruno Kron Guandalini  
 
-Tutorial passo a passo para instalação do PYTHIA8 com suporte ao ROOT em sistemas Linux, e execução de simulações de eventos em física de altas energias.
-
----
-
-## Sumário
-
-1. [Introdução](#1-introdução)
-2. [Pré-requisitos](#2-pré-requisitos)
-3. [Passo 1 — Instalação do Miniconda](#3-passo-1--instalação-do-miniconda)
-4. [Passo 2 — Criação do ambiente Conda com ROOT](#4-passo-2--criação-do-ambiente-conda-com-root)
-5. [Passo 3 — Instalação do PYTHIA8](#5-passo-3--instalação-do-pythia8)
-6. [Passo 4 — Configuração das variáveis de ambiente](#6-passo-4--configuração-das-variáveis-de-ambiente)
-7. [Passo 5 — Rodando exemplo: Simulação Z → µ⁺µ⁻](#7-passo-5--rodando-exemplo-simulação-z--µµ)
-8. [Passo 6 — Criação de atalhos](#8-passo-6--criação-de-atalhos)
-9. [Solução de problemas](#9-solução-de-problemas)
-10. [Referências](#10-referências)
+Step-by-step tutorial for installing PYTHIA8 with ROOT support on Linux systems, and running event simulations in high-energy physics.
 
 ---
 
-## 1. Introdução
+## Table of Contents
 
-O PYTHIA8 é um programa para simulações de eventos em física de altas energias, amplamente utilizado para gerar colisões hadrônicas e processos de decaimento. Este tutorial descreve passo a passo a instalação do PYTHIA8 com suporte ao ROOT em sistemas Linux.
+1. [Introduction](#1-introduction)
+2. [Prerequisites](#2-prerequisites)
+3. [Step 1 — Installing Miniconda](#3-step-1--installing-miniconda)
+4. [Step 2 — Creating the Conda environment with ROOT](#4-step-2--creating-the-conda-environment-with-root)
+5. [Step 3 — Installing PYTHIA8](#5-step-3--installing-pythia8)
+6. [Step 4 — Setting up environment variables](#6-step-4--setting-up-environment-variables)
+7. [Step 5 — Running an example: Z → µ⁺µ⁻ simulation](#7-step-5--running-an-example-z--µµ-simulation)
+8. [Step 6 — Creating shortcuts](#8-step-6--creating-shortcuts)
+9. [Troubleshooting](#9-troubleshooting)
+10. [References](#10-references)
 
 ---
 
-## 2. Pré-requisitos
+## 1. Introduction
 
-Antes de instalar o PYTHIA8, é necessário ter o **Conda** e o **ROOT** instalados. Caso já possua esses sistemas configurados, pule para o [Passo 3](#5-passo-3--instalação-do-pythia8).
+PYTHIA8 is a program for event simulations in high-energy physics, widely used to generate hadronic collisions and decay processes. This tutorial describes step by step the installation of PYTHIA8 with ROOT support on Linux systems.
 
 ---
 
-## 3. Passo 1 — Instalação do Miniconda
+## 2. Prerequisites
 
-O Miniconda é uma distribuição mínima do Anaconda que facilita o gerenciamento de ambientes Python.
+Before installing PYTHIA8, you need to have **Conda** and **ROOT** installed. If you already have these systems set up, skip to [Step 3](#5-step-3--installing-pythia8).
+
+---
+
+## 3. Step 1 — Installing Miniconda
+
+Miniconda is a minimal distribution of Anaconda that facilitates Python environment management.
 
 ```bash
-# Download do instalador do Miniconda
+# Download the Miniconda installer
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
-# Execução do instalador
+# Run the installer
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
-> **Observação:** Após a instalação, feche e reabra o terminal para que as alterações no `PATH` tenham efeito.
+> **NOTE:** After installation, close and reopen the terminal for the `PATH` changes to take effect.
 
 ---
 
-## 4. Passo 2 — Criação do ambiente Conda com ROOT
+## 4. Step 2 — Creating the Conda environment with ROOT
 
-Crie um ambiente Conda dedicado para o ROOT:
+Create a dedicated Conda environment for ROOT:
 
 ```bash
-# Criação do ambiente com ROOT
+# Create the environment with ROOT
 conda create -n root_env root -c conda-forge
 
-# Ativação do ambiente
+# Activate the environment
 conda activate root_env
 ```
 
-- `conda create -n root_env root` → cria um novo ambiente chamado `root_env` com o ROOT instalado
-- `-c conda-forge` → especifica o canal conda-forge para download
-- `conda activate root_env` → ativa o ambiente recém-criado
+- `conda create -n root_env root` → creates a new environment called `root_env` with ROOT installed
+- `-c conda-forge` → specifies the conda-forge channel for downloading
+- `conda activate root_env` → activates the newly created environment
 
 ---
 
-## 5. Passo 3 — Instalação do PYTHIA8
+## 5. Step 3 — Installing PYTHIA8
 
-### 5.1 Download e extração
+### 5.1 Download and extraction
 
 ```bash
-# Download do PYTHIA8
+# Download PYTHIA8
 wget https://pythia.org/download/pythia83/pythia8315.tgz
 
-# Extração do arquivo
+# Extract the file
 tar xvfz pythia8315.tgz
 
-# Entrar no diretório
+# Enter the directory
 cd pythia8315
 ```
 
-### 5.2 Configuração com suporte ao ROOT
+### 5.2 Configuration with ROOT support
 
 ```bash
 ./configure --with-root=$CONDA_PREFIX --prefix=$HOME/pythia8
 ```
 
-- `--with-root=$CONDA_PREFIX` → habilita o suporte ao ROOT usando o caminho do ambiente Conda
-- `--prefix=$HOME/pythia8` → define o diretório de instalação do PYTHIA8
+- `--with-root=$CONDA_PREFIX` → enables ROOT support using the Conda environment path
+- `--prefix=$HOME/pythia8` → sets the PYTHIA8 installation directory
 
-### 5.3 Compilação e instalação
+### 5.3 Compilation and installation
 
 ```bash
-# Compilação usando múltiplos núcleos
+# Compile using multiple cores
 make -j$(nproc)
 
-# Instalação
+# Install
 make install
 ```
 
-- `make -j$(nproc)` → compila usando todos os núcleos disponíveis
-- `make install` → instala os arquivos no diretório especificado
+- `make -j$(nproc)` → compiles using all available cores
+- `make install` → installs the files to the specified directory
 
 ---
 
-## 6. Passo 4 — Configuração das variáveis de ambiente
+## 6. Step 4 — Setting up environment variables
 
-Adicione as seguintes linhas ao `~/.bashrc`:
+Add the following lines to `~/.bashrc`:
 
 ```bash
 export PATH=$HOME/pythia8/bin:$PATH
@@ -117,14 +117,14 @@ export PYTHIA8=$HOME/pythia8
 export PYTHIA8DATA=$HOME/pythia8/share/Pythia8/xmldoc
 ```
 
-| Variável | Descrição |
+| Variable | Description |
 |----------|-----------|
-| `PATH` | Permite executar programas do PYTHIA8 de qualquer diretório |
-| `LD_LIBRARY_PATH` | Informa ao sistema onde encontrar as bibliotecas |
-| `PYTHIA8` | Aponta para o diretório de instalação |
-| `PYTHIA8DATA` | Localização dos arquivos de dados do PYTHIA8 |
+| `PATH` | Allows running PYTHIA8 programs from any directory |
+| `LD_LIBRARY_PATH` | Tells the system where to find the libraries |
+| `PYTHIA8` | Points to the installation directory |
+| `PYTHIA8DATA` | Location of PYTHIA8 data files |
 
-Recarregue o terminal:
+Reload the terminal:
 
 ```bash
 source ~/.bashrc
@@ -132,17 +132,17 @@ source ~/.bashrc
 
 ---
 
-## 7. Passo 5 — Rodando exemplo: Simulação Z → µ⁺µ⁻
+## 7. Step 5 — Running an example: Z → µ⁺µ⁻ simulation
 
-**Objetivo:** Criar, compilar e executar uma simulação completa de produção do bóson Z.
+**Objective:** Create, compile, and run a complete simulation of Z boson production.
 
-### 7.1 Criar o arquivo de simulação
+### 7.1 Create the simulation file
 
 ```bash
 nano z_mumu_simulation.cc
 ```
 
-Cole o seguinte código:
+Paste the following code:
 
 ```cpp
 #include "Pythia8/Pythia.h"
@@ -191,67 +191,67 @@ int main() {
 }
 ```
 
-Para salvar no editor `nano`:
+To save in the `nano` editor:
 
-1. Pressione `Ctrl+O` para salvar
-2. Pressione `Enter` para confirmar o nome do arquivo
-3. Pressione `Ctrl+X` para sair
+1. Press `Ctrl+O` to salve
+2. Press `Enter` to confirm the filename
+3. Press `Ctrl+X` to exit
 
-### 7.2 Compilar e executar
+### 7.2 Compile and run
 
 ```bash
-# Compilar
+# Compile
 g++ z_mumu_simulation.cc -o z_mumu_simulation \
     -I$PYTHIA8/include \
     -L$PYTHIA8/lib -lpythia8 \
     `root-config --cflags --glibs`
 
-# Executar
+# Run
 ./z_mumu_simulation
 ```
 
-### 7.3 Analisar os resultados
+### 7.3 Analyze the results
 
 ```bash
-# Abrir o arquivo ROOT gerado
+# Open the generated ROOT file
 root -l z_mumu.root
 
-# No ambiente ROOT, visualize o histograma:
+# In the ROOT environment, visualize the histogram:
 h_mll->Draw()
 ```
 
-### 7.4 Entendendo o código
+### 7.4 Understanding the code
 
-A simulação produz o bóson Z em colisões próton-próton a 13 TeV, forçando o decaimento Z → µ⁺µ⁻:
+The simulation produces Z bosons in proton-proton collisions at 13 TeV, forcing the decay Z → µ⁺µ⁻:
 
 | Parâmetro | Descrição |
 |-----------|-----------|
-| `Beams:idA = 2212` e `Beams:idB = 2212` | Definem prótons nos feixes |
-| `Beams:eCM = 13000.` | Energia no centro de massa de 13 TeV |
-| `WeakSingleBoson:ffbar2gmZ = on` | Ativa produção do bóson Z |
-| `23:onMode = off` | Desativa todos os decaimentos padrão do Z |
-| `23:onIfAny = 13` | Força Z → µ⁺µ⁻ (código PDG do múon: 13) |
+| `Beams:idA = 2212` and `Beams:idB = 2212` | Set protons in the beams |
+| `Beams:eCM = 13000.` | ECenter-of-mass energy of 13 TeV |
+| `WeakSingleBoson:ffbar2gmZ = on` | Enables Z boson production |
+| `23:onMode = off` | Disables all standard Z decays |
+| `23:onIfAny = 13` | Force Z → µ⁺µ⁻ (PDG code for muon: 13) |
 
-O código reconstrói a massa invariante do par µ⁺µ⁻ e preenche um histograma. O resultado esperado é um pico na massa do Z (~91 GeV).
+The code reconstructs the invariant mass of the µ⁺µ⁻ pair and fills a histogram. The expected result is a peak at the Z mass (~91 GeV).
 
 ---
 
-## 8. Passo 6 — Criação de atalhos
+## 8. Step 6 — Creating shortcuts
 
-### 8.1 Editar o arquivo de configuração
+### 8.1 Edit the configuration file
 
 ```bash
 nano ~/.bashrc
 ```
 
-### 8.2 Adicionar os atalhos
+### 8.2 Add the shortcuts
 
 ```bash
-# Atalho para ativar root_env e entrar no pythia8315
+# Shortcut to activate root_env and enter pythia8315
 alias pythia='conda activate root_env && cd ~/pythia8315'
 
-# Atalho para compilar exemplos comuns
-alias compilar_z_mumu='g++ z_mumu_simulation.cc -o z_mumu_simulation \
+# Shortcut to compile common examples
+alias compile_z_mumu='g++ z_mumu_simulation.cc -o z_mumu_simulation \
     -I$PYTHIA8/include -I$ROOTSYS/include \
     -L$PYTHIA8/lib -L$ROOTSYS/lib \
     -Wl,-rpath,$PYTHIA8/lib -Wl,-rpath,$ROOTSYS/lib \
@@ -259,42 +259,42 @@ alias compilar_z_mumu='g++ z_mumu_simulation.cc -o z_mumu_simulation \
     -std=c++20 -O2'
 ```
 
-### 8.3 Recarregar as configurações
+### 8.3 Reload the configurations
 
 ```bash
 source ~/.bashrc
 ```
 
-### 8.4 Usar o atalho
+### 8.4 se the shortcut
 
 ```bash
 pythia
 ```
 
-**Resultado esperado:**
+**Expected result:**
 ```
-(root_env) SEU-USUÁRIO@SUA-MÁQUINA:~/pythia8315$
+(root_env) YOUR-USER@YOUR-MACHINE:~/pythia8315$
 ```
 
-> `SEU-USUÁRIO` e `SUA-MÁQUINA` serão automaticamente substituídos pelos nomes do seu sistema.
+> `YOUR-USER` and `YOUR-MACHINE` will be automatically replaced with your system's names.
 
 ---
 
-## 9. Solução de problemas
+## 9. Troubleshooting
 
-| Problema | Solução |
+| Problem | Solution |
 |----------|---------|
-| Erro de biblioteca não encontrada | Verifique se as variáveis de ambiente estão configuradas corretamente |
-| Problemas de compilação | Certifique-se de que o ambiente Conda está ativado (`conda activate root_env`) |
-| Arquivos de dados não encontrados | Confirme se a variável `PYTHIA8DATA` aponta para o diretório correto |
-| Erro no ROOT | Verifique se todas as bibliotecas do ROOT estão disponíveis no ambiente |
+| Library not found error |	Verify that the environment variables are set correctly |
+| Compilation issues | Make sure the Conda environment is activated (`conda activate root_env`) |
+| Data files not found | Confirm that the `PYTHIA8DATA` variable points to the correct directory |
+| ROOT error | Check that all ROOT libraries are available in the environment |
 
 ---
 
-## 10. Referências
+## 10. References
 
 - [Miniconda Documetation](https://www.anaconda.com/docs/getting-started/miniconda/main)
-- [Site oficial do PYTHIA](https://pythia.org)
-- [Documentação do PYTHIA8](https://pythia.org/latest-manual/)
-- [Guia sobre o PYTHIA8 (PDF)](https://pythia.org/download/pdf/pythia8300.pdf)
-- [Códigos PDG para partículas](https://pdg.lbl.gov)
+- [PYTHIA Official Website](https://pythia.org)
+- [PYTHIA8 Documetation](https://pythia.org/latest-manual/)
+- [PYTHIA8 Guide (PDF)](https://pythia.org/download/pdf/pythia8300.pdf)
+- [PDG Particle Codes](https://pdg.lbl.gov)

@@ -1,8 +1,6 @@
 # PYTHIA8 Tutorial
 
 > **Autor:** Bruno Kron Guandalini  
-> Universidade do Estado do Rio de Janeiro — Instituto de Física Armando Dias Tavares  
-> Departamento de Física de Altas Energias · Rio de Janeiro, 2026
 
 Tutorial passo a passo para instalação do PYTHIA8 com suporte ao ROOT em sistemas Linux, e execução de simulações de eventos em física de altas energias.
 

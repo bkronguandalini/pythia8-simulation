@@ -15,7 +15,7 @@ Step-by-step tutorial for installing PYTHIA8 with ROOT support on Linux systems,
 5. [Step 3 — Installing PYTHIA8](#5-step-3--installing-pythia8)
 6. [Step 4 — Setting up environment variables](#6-step-4--setting-up-environment-variables)
 7. [Step 5 — Running an example: Z → µ⁺µ⁻ simulation](#7-step-5--running-an-example-z--µµ-simulation)
-8. [Step 6 — Creating shortcuts](#8-step-6--creating-shortcuts)
+8. [Step 6 — Creating shortcuts (Optional)](#8-step-6--creating-shortcuts)
 9. [Troubleshooting](#9-troubleshooting)
 10. [References](#10-references)
 

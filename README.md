@@ -141,6 +141,7 @@ source ~/.bashrc
 ```bash
 nano test.cpp
 ```
+Tip: The name `test` can be replaced by any name you prefer. For example, you can use `nano z_mumu_simulation.cpp`.
 
 Paste the following code:
 
@@ -210,6 +211,8 @@ g++ test.cpp -o test \
 ./test
 ```
 
+Tip: Just remember to adjust the compilation command according to the name you choose in [7.1](#7.1-create-the-simulation-file) (replace `test.cpp` and `-o test`).
+
 ### 7.3 Analyze the results
 
 ```bash
@@ -258,6 +261,8 @@ alias compile_test='g++ test.cpp -o test \
     -lpythia8 $(root-config --glibs) \
     -std=c++20 -O2'
 ```
+
+Tip: Just remember to adjust the compilation command according to the name you choose in [7.1](#7.1-create-the-simulation-file) (replace `test.cpp` and `-o test`).
 
 ### 8.3 Reload the configurations
 

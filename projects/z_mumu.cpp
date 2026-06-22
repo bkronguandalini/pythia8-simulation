@@ -1,6 +1,6 @@
 // Desenvolvido por: Bruno Kron Guandalini
 // Descrição: Simulação de produção de Z⁰ com decaimento em μ⁺μ⁻ usando Pythia8 e ROOT.
-// Objetivo: Estudar a massa invariante do Z⁰ a 13 TeV.
+// Objetivo: Estudar as propriedades do Z⁰ e seu decaimento em μ⁺μ⁻ a 13 TeV.
 
 #include "Pythia8/Pythia.h" // Biblioteca principal do Pythia8
 #include "TH1D.h" // Histograma unidimensional do ROOT

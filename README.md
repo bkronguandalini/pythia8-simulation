@@ -236,7 +236,7 @@ The code reconstructs the invariant mass of the µ⁺µ⁻ pair and fills a hist
 
 ---
 
-## 8. Step 6 — Creating shortcuts
+## 8. Step 6 — Creating shortcuts (Optional)
 
 ### 8.1 Edit the configuration file
 

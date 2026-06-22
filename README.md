@@ -211,7 +211,7 @@ g++ test.cpp -o test \
 ./test
 ```
 
-Tip: Just remember to adjust the compilation command according to the name you choose in [7.1](#7.1-create-the-simulation-file) (replace `test.cpp` and `-o test`).
+Tip: Just remember to adjust the compilation command according to the name you choose in [7.1](#71-create-the-simulation-file) (replace `test.cpp` and `-o test`).
 
 ### 7.3 Analyze the results
 

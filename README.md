@@ -251,7 +251,7 @@ nano ~/.bashrc
 alias pythia='conda activate root_env && cd ~/pythia8315'
 
 # Shortcut to compile common examples
-alias compile_z_mumu='g++ z_mumu_simulation.cc -o z_mumu_simulation \
+alias compile_test='g++ test.cpp -o test \
     -I$PYTHIA8/include -I$ROOTSYS/include \
     -L$PYTHIA8/lib -L$ROOTSYS/lib \
     -Wl,-rpath,$PYTHIA8/lib -Wl,-rpath,$ROOTSYS/lib \

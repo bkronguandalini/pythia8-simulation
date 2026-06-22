@@ -139,7 +139,7 @@ source ~/.bashrc
 ### 7.1 Create the simulation file
 
 ```bash
-nano z_mumu_simulation.cc
+nano test.cpp
 ```
 
 Paste the following code:
@@ -201,13 +201,13 @@ To save in the `nano` editor:
 
 ```bash
 # Compile
-g++ z_mumu_simulation.cc -o z_mumu_simulation \
+g++ test.cpp -o test \
     -I$PYTHIA8/include \
     -L$PYTHIA8/lib -lpythia8 \
     `root-config --cflags --glibs`
 
 # Run
-./z_mumu_simulation
+./test
 ```
 
 ### 7.3 Analyze the results

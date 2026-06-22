@@ -1,6 +1,6 @@
 // Desenvolvido por: Bruno Kron Guandalini
 // Descrição: Simulação de produção de W⁺/W⁻ com decaimento em μ⁺ν_μ / μ⁻ν̄_μ usando Pythia8 e ROOT.
-// Objetivo: Estudar a massa transversa do W a 13 TeV.
+// Objetivo: Estudar as propriedades do W⁺/W⁻ e seu decaimento em μ⁺ν_μ / μ⁻ν̄_μ a 13 TeV.
 
 #include "Pythia8/Pythia.h" // Biblioteca principal do Pythia8
 #include "TH1D.h"           // Histograma unidimensional do ROOT

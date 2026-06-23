@@ -11,6 +11,9 @@ def main():
     # ================================================================
     # 1. Configuração do Pythia
     # ================================================================
+    
+    ROOT.gROOT.SetBatch(ROOT.kTRUE) # Ativa modo batch (sem janelas gráficas)
+
     pythia = pythia8.Pythia()
 
     # Definições do feixe 
@@ -56,6 +59,15 @@ def main():
     h_eta_muPlus = ROOT.TH1D("h_eta_muPlus", "Pseudorapidity of #mu^{+}; #eta; Events", 100, -5.0, 5.0)
     h_eta_muMinus = ROOT.TH1D("h_eta_muMinus", "Pseudorapidity of #mu^{-}; #eta; Events", 100, -5.0, 5.0)
 
+    # Cores
+    h_mass_mumu.SetLineColor(ROOT.kBlue)
+    h_pt_Z.SetLineColor(ROOT.kBlue)
+    h_eta_Z.SetLineColor(ROOT.kBlue)
+    h_pt_muPlus.SetLineColor(ROOT.kRed)
+    h_pt_muMinus.SetLineColor(ROOT.kGreen)
+    h_eta_muPlus.SetLineColor(ROOT.kRed)
+    h_eta_muMinus.SetLineColor(ROOT.kGreen)
+
     # ===============================================================
     # 3. Loop de eventos
     # ===============================================================
@@ -100,46 +112,42 @@ def main():
                     massa = pSum.mCalc()
                     h_mass_mumu.Fill(massa)
 
-    # ---------- Finalização ----------
     pythia.stat() # Estatísticas da geração de eventos
+
+    # =======================================================
+    # 4. PDF MULTIPÁGINA
+    # =======================================================
+    
+    # Lista de histogramas com flag para escala log (no eixo Y)
+    h_logs = [
+        (h_mass_mumu, False),
+        (h_pt_Z, True),
+        (h_eta_Z, False),
+        (h_pt_muPlus, True),
+        (h_pt_muMinus, True),
+        (h_eta_muPlus, False),
+        (h_eta_muMinus, False),
+    ]
+
+    # Cria um canvas para desenhar cada histograma em uma página
+    c = ROOT.TCanvas("c", "Z^{0} #rightarrow #mu^{+}#mu^{-}", 1200, 800)
+    pdf_z = "z_mumu.pdf"
+
+    # Inicia o PDF multipágina
+    c.Print(pdf_z + "[")  
+
+    for hist, logy in h_logs:
+        c.Clear()  # Limpa o canvas
+        c.SetLogy(1 if logy else 0)  # Escala log ou linear
+        hist.Draw("HIST")            # Desenha o histograma
+        c.Update()                   # Atualiza o canvas 
+        c.Print(pdf_z)               # Salva a página
+
+
+    c.Print(pdf_z + "]")  # Finaliza o PDF
+
     outFile.Write() # Salva todos os histogramas no arquivo
     outFile.Close() # Fecha o arquivo ROOT
-
-    # =======================================================
-    # 4. Desenha os histogramas usando ROOT e salva em PDF
-    # =======================================================
-    c1 = ROOT.TCanvas("c1", "Z^{0} #rightarrow #mu^{+}#mu^{-}", 1200, 800) # Cria um canvas para desenhar os histogramas
-    c1.Divide(3, 3) # Divide o canvas em 3x3 subplots
- 
-    # Cores: kBlue (azul), kRed (vermelho), kGreen (verde)
-    h_mass_mumu.SetLineColor(ROOT.kBlue)
-    h_pt_Z.SetLineColor(ROOT.kBlue)
-    h_eta_Z.SetLineColor(ROOT.kBlue)
-    h_pt_muPlus.SetLineColor(ROOT.kRed)
-    h_pt_muMinus.SetLineColor(ROOT.kGreen)
-    h_eta_muPlus.SetLineColor(ROOT.kRed)
-    h_eta_muMinus.SetLineColor(ROOT.kGreen)
-
-    # ------ Desenha os histogramas --------
-
-    # Massa invariante
-    c1.cd(1); h_mass_mumu.Draw()
-
-    # Momento Transversal Z⁰
-    c1.cd(2); ROOT.gPad.SetLogy(1); h_pt_Z.Draw()
-
-    # Pseudorapidez Z⁰
-    c1.cd(3); h_eta_Z.Draw()
-
-    # Momento Transversal μ⁺ e μ⁻
-    c1.cd(4); ROOT.gPad.SetLogy(1); h_pt_muPlus.Draw()
-    c1.cd(5); ROOT.gPad.SetLogy(1); h_pt_muMinus.Draw()
-
-    # Pseudorapidez μ⁺ e μ⁻
-    c1.cd(6); h_eta_muPlus.Draw()
-    c1.cd(7); h_eta_muMinus.Draw()
-
-    c1.SaveAs("z_mumu.pdf") # Salva o canvas em PDF
 
     print("\nArquivo ROOT: z_mumu.root") # Informa o usuário sobre o arquivo ROOT gerado
     print("PDF gerado: z_mumu.pdf") # Informa o usuário sobre o PDF gerado

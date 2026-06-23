@@ -2,11 +2,11 @@
 
 > **Author:** Bruno Kron Guandalini
 
-[![Linux Mint](https://img.shields.io/badge/Linux-Mint-87CF3E?logo=linuxmint&logoColor=white)]()
-[![ROOT](https://img.shields.io/badge/ROOT-6-blue)]()
-[![PYTHIA8](https://img.shields.io/badge/PYTHIA-8-green)]()
-[![C++20](https://img.shields.io/badge/C%2B%2B-20-red)]()
-[![Python](https://img.shields.io/badge/Python-3.10-yellow)]()
+[![Linux Mint](https://img.shields.io/badge/Linux-Mint-87CF3E?logo=linuxmint&logoColor=white)](https://linuxmint.com/)
+[![ROOT](https://img.shields.io/badge/ROOT-6-blue)](https://root.cern/)
+[![PYTHIA8](https://img.shields.io/badge/PYTHIA-8-orange)](https://www.pythia.org/)
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-red)](https://cppreference.com/cpp/20)
+[![Python](https://img.shields.io/badge/Python-3.10-yellow)](https://www.python.org/)
 
 Step-by-step tutorial for installing PYTHIA8 with ROOT support on Linux systems and running event simulations in high-energy physics.
 

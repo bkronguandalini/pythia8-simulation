@@ -1,24 +1,49 @@
 # PYTHIA8 Tutorial
 
-> **Author:** Bruno Kron Guandalini  
+> **Author:** Bruno Kron Guandalini
 
-Step-by-step tutorial for installing PYTHIA8 with ROOT support on Linux systems, and running event simulations in high-energy physics.
+[![Linux Mint](https://img.shields.io/badge/Linux-Mint-87CF3E?logo=linuxmint&logoColor=white)]()
+[![ROOT](https://img.shields.io/badge/ROOT-6-blue)]()
+[![PYTHIA8](https://img.shields.io/badge/PYTHIA-8-green)]()
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-red)]()
+[![Python](https://img.shields.io/badge/Python-3.10-yellow)]()
 
+Step-by-step tutorial for installing PYTHIA8 with ROOT support on Linux systems and running event simulations in high-energy physics.
+
+> **Tested on Linux Mint.** The same instructions should work on Ubuntu and other Debian-based distributions, perhaps with minor modifications.
 ---
 
-## Table of Contents
+# Table of Contents
 
 1. [Introduction](#1-introduction)
 2. [Prerequisites](#2-prerequisites)
-3. [Step 1 — Installing Miniconda](#3-step-1--installing-miniconda)
-4. [Step 2 — Creating the Conda environment with ROOT](#4-step-2--creating-the-conda-environment-with-root)
-5. [Step 3 — Installing PYTHIA8](#5-step-3--installing-pythia8)
-6. [Step 4 — Setting up environment variables](#6-step-4--setting-up-environment-variables)
-7. [Step 5 — Running an example: Z → µ⁺µ⁻ simulation](#7-step-5--running-an-example-z--µµ-simulation)
-8. [Step 6 — Creating shortcuts (Optional)](#8-step-6--creating-shortcuts-optional)
-9. [Troubleshooting](#9-troubleshooting)
-10. [References](#10-references)
-
+3. [C++ Interface](#3-c-interface)
+   - [3.1 Installing Miniconda](#31-installing-miniconda)
+   - [3.2 Creating the ROOT environment](#32-creating-the-conda-environment-with-root)
+   - [3.3 Installing PYTHIA8](#33-installing-pythia8)
+      - [3.3.1 Download and extraction](#331-download-and-extraction)
+      - [3.3.2 Configuration with ROOT support](#332-configuration-with-root-support)
+      - [3.3.3 Compilation and installation](#333-compilation-and-installation)
+   - [3.4 Setting up environment variables](#34-setting-up-environment-variables)
+   - [3.5 Running an example: Z → µ⁺µ⁻ simulation](#35-running-an-example-z--µµ-simulation)
+      - [3.5.1 Create the simulation file](#351-create-the-simulation-file)
+      - [3.5.2 Compile and run](#352-compile-and-run)
+      - [3.5.3 Analyze the results](#353-analyze-the-results)
+      - [3.5.4 Understanding the code](#354-understanding-the-code)
+   - [3.6 Creating shortcuts (Optional)](#36-creating-shortcuts-optional)
+      - [3.6.1 Edit the configuration file](#361-edit-the-configuration-file)
+      - [3.6.2 Add the shortcuts](#362-add-the-shortcuts)
+      - [3.6.3 Reload the configurations](#363-reload-the-configurations)
+      - [3.6.4 Use the shortcut](#364-use-the-shortcut)
+4. [Python Interface](#4-python-interface)
+   - [4.1 Creating a clean Conda environment](#41-creating-a-clean-conda-environment)
+   - [4.2 Installing PYTHIA8 and ROOT via conda-forge](#42-installing-pythia8-and-root-via-conda-forge)
+   - [4.3 Running a script](#43-running-a-script)
+   - [4.4 Quick library check (Optional)](#44-quick-library-check-optional)
+5. [Troubleshooting](#5-troubleshooting)
+   - [5.1 C++](#51-c)
+   - [5.2 Python](#52-python)
+6. [References](#6-references)
 ---
 
 ## 1. Introduction
@@ -29,11 +54,17 @@ PYTHIA8 is a program for event simulations in high-energy physics, widely used t
 
 ## 2. Prerequisites
 
-Before installing PYTHIA8, you need to have **Conda** and **ROOT** installed. If you already have these systems set up, skip to [Step 3](#5-step-3--installing-pythia8).
+Before installing PYTHIA8, you need to have **Conda** and **ROOT** installed. If you already have these systems set up, skip to [Installing PYTHIA8](#33-installing-pythia8).
 
 ---
 
-## 3. Step 1 — Installing Miniconda
+## 3. C++ Interface
+
+This section describes how to compile and run simulations using C++ and ROOT.
+
+---
+
+### 3.1 Installing Miniconda
 
 Miniconda is a minimal distribution of Anaconda that facilitates Python environment management.
 
@@ -49,7 +80,7 @@ bash Miniconda3-latest-Linux-x86_64.sh
 
 ---
 
-## 4. Step 2 — Creating the Conda environment with ROOT
+### 3.2 Creating the Conda environment with ROOT
 
 Create a dedicated Conda environment for ROOT:
 
@@ -67,9 +98,9 @@ conda activate root_env
 
 ---
 
-## 5. Step 3 — Installing PYTHIA8
+### 3.3 Installing PYTHIA8
 
-### 5.1 Download and extraction
+#### 3.3.1 Download and extraction
 
 ```bash
 # Download PYTHIA8
@@ -82,7 +113,7 @@ tar xvfz pythia8315.tgz
 cd pythia8315
 ```
 
-### 5.2 Configuration with ROOT support
+#### 3.3.2 Configuration with ROOT support
 
 ```bash
 ./configure --with-root=$CONDA_PREFIX --prefix=$HOME/pythia8
@@ -91,7 +122,7 @@ cd pythia8315
 - `--with-root=$CONDA_PREFIX` → enables ROOT support using the Conda environment path
 - `--prefix=$HOME/pythia8` → sets the PYTHIA8 installation directory
 
-### 5.3 Compilation and installation
+#### 3.3.3 Compilation and installation
 
 ```bash
 # Compile using multiple cores
@@ -106,7 +137,7 @@ make install
 
 ---
 
-## 6. Step 4 — Setting up environment variables
+### 3.4 Setting up environment variables
 
 Add the following lines to `~/.bashrc`:
 
@@ -118,11 +149,11 @@ export PYTHIA8DATA=$HOME/pythia8/share/Pythia8/xmldoc
 ```
 
 | Variable | Description |
-|----------|-----------|
+|------------|------------|
 | `PATH` | Allows running PYTHIA8 programs from any directory |
 | `LD_LIBRARY_PATH` | Tells the system where to find the libraries |
 | `PYTHIA8` | Points to the installation directory |
-| `PYTHIA8DATA` | Location of PYTHIA8 data files |
+| `PYTHIA8DATA` | Location of the XML files |
 
 Reload the terminal:
 
@@ -132,11 +163,11 @@ source ~/.bashrc
 
 ---
 
-## 7. Step 5 — Running an example: Z → µ⁺µ⁻ simulation
+### 3.5 Running an example: Z → µ⁺µ⁻ simulation
 
 **Objective:** Create, compile, and run a complete simulation of Z boson production.
 
-### 7.1 Create the simulation file
+#### 3.5.1 Create the simulation file
 
 ```bash
 nano test.cpp
@@ -155,12 +186,12 @@ using namespace Pythia8;
 
 int main() {
     Pythia pythia;
-    pythia.readString("Beams:idA = 2212");               // próton
-    pythia.readString("Beams:idB = 2212");               // próton
-    pythia.readString("Beams:eCM = 13000.");             // energia de centro de massa (13 TeV)
-    pythia.readString("WeakSingleBoson:ffbar2gmZ = on"); // ativa produção de Z
-    pythia.readString("23:onMode = off");                // desativa todos os decaimentos do Z
-    pythia.readString("23:onIfAny = 13");                // apenas Z -> mu+mu- (13 é o código PDG)
+    pythia.readString("Beams:idA = 2212");               // proton
+    pythia.readString("Beams:idB = 2212");               // proton
+    pythia.readString("Beams:eCM = 13000.");             // center-of-mass energy (13 TeV)
+    pythia.readString("WeakSingleBoson:ffbar2gmZ = on"); // enable Z production
+    pythia.readString("23:onMode = off");                // disable all Z decays
+    pythia.readString("23:onIfAny = 13");                // only Z -> mu+mu- (PDG Code: 13)
     pythia.init();
 
     TFile* outfile = new TFile("z_mumu.root", "RECREATE");
@@ -198,7 +229,9 @@ To save in the `nano` editor:
 2. Press `Enter` to confirm the filename
 3. Press `Ctrl+X` to exit
 
-### 7.2 Compile and run
+---
+
+#### 3.5.2 Compile and run
 
 ```bash
 # Compile
@@ -211,9 +244,9 @@ g++ test.cpp -o test \
 ./test
 ```
 
-Tip: Just remember to adjust the compilation command according to the name you choose in [7.1](#71-create-the-simulation-file) (replace `test.cpp` and `-o test`).
+Tip: Just remember to adjust the compilation command according to the name you choose in [3.5.1](#351-create-the-simulation-file) (replace `test.cpp` and `-o test`).
 
-### 7.3 Analyze the results
+#### 3.5.3 Analyze the results
 
 ```bash
 # Open the generated ROOT file
@@ -223,14 +256,14 @@ root -l z_mumu.root
 h_mll->Draw()
 ```
 
-### 7.4 Understanding the code
+#### 3.5.4 Understanding the code
 
 The simulation produces Z bosons in proton-proton collisions at 13 TeV, forcing the decay Z → µ⁺µ⁻:
 
-| Parâmetro | Descrição |
+| Parameter | Description |
 |-----------|-----------|
 | `Beams:idA = 2212` and `Beams:idB = 2212` | Set protons in the beams |
-| `Beams:eCM = 13000.` | ECenter-of-mass energy of 13 TeV |
+| `Beams:eCM = 13000.` | Center-of-mass energy of 13 TeV |
 | `WeakSingleBoson:ffbar2gmZ = on` | Enables Z boson production |
 | `23:onMode = off` | Disables all standard Z decays |
 | `23:onIfAny = 13` | Force Z → µ⁺µ⁻ (PDG code for muon: 13) |
@@ -239,15 +272,15 @@ The code reconstructs the invariant mass of the µ⁺µ⁻ pair and fills a hist
 
 ---
 
-## 8. Step 6 — Creating shortcuts (Optional)
+### 3.6 Creating shortcuts (Optional)
 
-### 8.1 Edit the configuration file
+#### 3.6.1 Edit the configuration file
 
 ```bash
 nano ~/.bashrc
 ```
 
-### 8.2 Add the shortcuts
+#### 3.6.2 Add the shortcuts
 
 ```bash
 # Shortcut to activate root_env and enter pythia8315
@@ -262,15 +295,15 @@ alias compile_test='g++ test.cpp -o test \
     -std=c++20 -O2'
 ```
 
-Tip: Just remember to adjust the compilation command according to the name you choose in [7.1](#7.1-create-the-simulation-file) (replace `test.cpp` and `-o test`).
+Tip: Just remember to adjust the compilation command according to the name you choose in [3.5.1](#351-create-the-simulation-file) (replace `test.cpp` and `-o test`).
 
-### 8.3 Reload the configurations
+#### 3.6.3 Reload the configurations
 
 ```bash
 source ~/.bashrc
 ```
 
-### 8.4 se the shortcut
+#### 3.6.4 Use the shortcut
 
 ```bash
 pythia
@@ -285,7 +318,72 @@ pythia
 
 ---
 
-## 9. Troubleshooting
+## 4. Python Interface
+
+This interface is the simplest and safest way to get started. Everything is installed automatically via `conda-forge` — no manual compilation needed. Recommended for anyone who prefers writing simulations in Python.
+
+> **Important:** Do not try to compile Pythia8 or ROOT manually when using this approach. Using conda-forge avoids library conflicts and `undefined symbol` errors.
+
+---
+
+### 4.1 Creating a clean Conda environment
+
+Create a separate environment to avoid conflicts with other installations:
+
+```bash
+conda create -n python_env python=3.10 -c conda-forge
+conda activate python_env
+```
+
+> **Tip:** Use Python 3.9 or 3.10 — these are stable and well-supported versions.
+
+**Expected result:**
+```
+(python_env) YOUR-USER@YOUR-MACHINE:~$
+```
+
+> `YOUR-USER` and `YOUR-MACHINE` will be automatically replaced with your system's names.
+---
+
+### 4.2 Installing PYTHIA8 and ROOT via conda-forge
+
+```bash
+conda install pythia8 root -c conda-forge
+```
+
+This single command installs:
+- The Pythia8 and ROOT C++ libraries
+- The Python bindings for both (`pythia8` and `ROOT`)
+
+---
+
+### 4.3 Running a script
+
+With the environment activated (`conda activate python_env`), simply run:
+
+```bash
+python test.py
+```
+
+If everything is set up correctly, the program will run and generate the output files (`.root`, `.pdf`, etc.).
+
+---
+
+### 4.4 Quick library check (Optional)
+
+Before running your full script, verify that both libraries are working:
+
+```bash
+python -c "import pythia8; print('Pythia OK')"
+
+python -c "import ROOT; print('ROOT OK')"
+```
+
+---
+
+## 5. Troubleshooting
+
+### 5.1 C++
 
 | Problem | Solution |
 |----------|---------|
@@ -294,9 +392,18 @@ pythia
 | Data files not found | Confirm that the `PYTHIA8DATA` variable points to the correct directory |
 | ROOT error | Check that all ROOT libraries are available in the environment |
 
+### 5.2 Python
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| `NameError: name 'null' is not defined` | Tried to run a `.ipynb` (JSON) file with Python | Extract the code with `nbconvert` or copy it manually to a `.py` file |
+| `ImportError: undefined symbol: _Py_HashPointer` | Python is loading a manually compiled ROOT built with a different Python version | Deactivate `$ROOTSYS` and `$PYTHONPATH` pointing to manual installations. Use only the ROOT from conda-forge |
+| `ModuleNotFoundError: No module named 'pythia8'` | Package not installed or wrong environment active | Activate the correct environment (`conda activate python_env`) and install via conda-forge |
+| Compilation error with `g++` | Trying to compile Python code with a C++ compiler | Python is interpreted: use `python script.py`, not `g++` |
+
 ---
 
-## 10. References
+## 6. References
 
 - [Miniconda Documetation](https://www.anaconda.com/docs/getting-started/miniconda/main)
 - [PYTHIA Official Website](https://pythia.org)

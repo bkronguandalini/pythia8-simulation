@@ -121,49 +121,51 @@ int main() {
   outFile.Close(); // Fecha o arquivo
 
   // ==================================================================
-  // 4. Desenha os histogramas usando o ROOT e salva em um arquivo PDF
+  // 4. PDF multipágina 
   // ==================================================================
 
-  TCanvas c1("c1", "Z^{0} #rightarrow #mu^{+}#mu^{-}", 1200, 800);
-  c1.Divide(3, 3);
-
-  // Cores para diferenciar os histogramas de cada partícula (constantes do ROOT) 
+  // Cores
   h_mass_mumu.SetLineColor(kBlue); 
   h_pt_Z.SetLineColor(kBlue);
   h_eta_Z.SetLineColor(kBlue);
   h_pt_muPlus.SetLineColor(kRed);
-  h_pt_muMinus.SetLineColor(kGreen+2);
+  h_pt_muMinus.SetLineColor(kGreen);
   h_eta_muPlus.SetLineColor(kRed);
-  h_eta_muMinus.SetLineColor(kGreen+2);
+  h_eta_muMinus.SetLineColor(kGreen);
 
-  // Desenha os histogramas em cada subcanvas
+  // Estrutura auxiliar para agrupar histograma + flag de escala log
+  struct Plot {
+      TH1D* hist;
+      bool logy;
+  };
 
-  // Massa invariante
-  c1.cd(1); h_mass_mumu.Draw();
+  // Histogramas na escala log
+  Plot h_logs[] = {
+      {&h_mass_mumu, false},
+      {&h_pt_Z,      true},
+      {&h_eta_Z,     false},
+      {&h_pt_muPlus, true},
+      {&h_pt_muMinus,true},
+      {&h_eta_muPlus,false},
+      {&h_eta_muMinus,false}
+  };
+  int nPlots = sizeof(h_logs) / sizeof(h_logs[0]);
 
-  // Momento Transverso (pT) do Z° (escala log)
-  c1.cd(2); gPad->SetLogy(1);
-  h_pt_Z.Draw();
+  // Canvas único e PDF
+  TCanvas c("c", "Z^{0} #rightarrow #mu^{+}#mu^{-}", 1200, 800);
+  TString pdf_z = "z_mumu.pdf";
+  c.Print(pdf_z + "[");   // inicia o PDF multipágina
 
-  // Pseudorapidez (η) do Z°
-  c1.cd(3); h_eta_Z.Draw();
+  // Loop sobre os histogramas
+  for (int i = 0; i < nPlots; ++i) {
+      c.Clear();
+      c.SetLogy(h_logs[i].logy ? 1 : 0);   // log se true, linear se false
+      h_logs[i].hist->Draw("HIST");
+      c.Update();
+      c.Print(pdf_z);   // adiciona uma página
+  }
 
-  // Momento Transverso (pT) do μ⁺ (escala log)
-  c1.cd(4); gPad->SetLogy(1);
-  h_pt_muPlus.Draw();
-
-  // Momento Transverso (pT) do μ⁻ (escala log)
-  c1.cd(5); gPad->SetLogy(1);
-  h_pt_muMinus.Draw();
-
-  // Pseudorapidez (η) do μ⁺ 
-  c1.cd(6); h_eta_muPlus.Draw();
-
-  // Pseudorapidez (η) do μ⁻
-  c1.cd(7); h_eta_muMinus.Draw();
-
-  // Salva o canvas com os histogramas em um arquivo PDF
-  c1.SaveAs("z_mumu.pdf");
+  c.Print(pdf_z+ "]");   // finaliza o PDF
 
   cout << "\nArquivo ROOT: z_mumu.root" << endl;
   cout << "PDF gerado: z_mumu.pdf" << endl;

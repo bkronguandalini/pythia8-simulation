@@ -21,7 +21,7 @@ int main() {
   pythia.readString("Beams:eCM = 13000."); // Energia total no centro de massa (13 TeV)
 
   // Produção de W⁺/W⁻ (e Z⁰) via Drell-Yan
-  pythia.readString("WeakSingleBoson:ffbar2gmZ = on");
+  pythia.readString("WeakSingleBoson:all = on");
 
   // Força o decaimento leptônico do W → μ ν
   pythia.readString("24:onMode = off");        // Desliga todos os canais do W⁺ (PDG 24)
@@ -136,15 +136,15 @@ int main() {
     }
   }
 
-  // ================================================================
-  // 4. Finalização e geração de PDF
-  // ================================================================
-  pythia.stat();
-  outFile.Write();
-  outFile.Close();
+  
+  // ---------- Finalização ----------
+  pythia.stat();   // Exibe estatísticas da simulação
+  outFile.Write(); // Escreve os histogramas no arquivo ROOT
+  outFile.Close(); // Fecha o arquivo
 
-  TCanvas c1("c1", "W^{#pm} #rightarrow #mu + #nu_{#mu}", 1200, 800);
-  c1.Divide(3, 3);
+  // ==================================================================
+  // 4. PDF multipágina 
+  // ==================================================================
 
   // Cores
   h_mass_W.SetLineColor(kBlue);
@@ -155,43 +155,36 @@ int main() {
   h_eta_mu.SetLineColor(kRed);
   h_eta_nu.SetLineColor(kGreen);
 
-  // ---- Desenha os histogramas ----
+  struct Plot {
+      TH1D* hist;
+      bool logy;
+  };
 
-  // Massa transversa do W
-  c1.cd(1); 
-  h_mass_W.Draw(); 
+  // Histogramas em escala log (no eixo Y)
+  Plot h_logs[] = {
+      {&h_mass_W, false},
+      {&h_pt_W,   true},
+      {&h_eta_W,  false},
+      {&h_pt_mu,  true},
+      {&h_pt_nu,  true},
+      {&h_eta_mu, false},
+      {&h_eta_nu, false}
+  };
+  int nPlots = sizeof(h_logs) / sizeof(h_logs[0]);
 
-  // Momento transverso (pT) do W (escala log)
-  c1.cd(2); 
-  gPad->SetLogy(1); 
-  h_pt_W.Draw();    // pT do W (log)
-
-  // Pseudorapidez (η) do W
-  c1.cd(3); 
-  h_eta_W.Draw();      
-
-  // Momento transverso (pT) do muon (escala log)
-  c1.cd(4); 
-  gPad->SetLogy(1); 
-  h_pt_mu.Draw();  
-
-  // Momento transverso (pT) do neutrino (escala log)
-  c1.cd(5);  
-  gPad->SetLogy(1); 
-  h_pt_nu.Draw();     
-  
-  // Pseudorapidez (η) do muon
-  c1.cd(6);
-  h_eta_mu.Draw();      
-
-  // Pseudorapidez (η) do neutrino
-  c1.cd(7); 
-  h_eta_nu.Draw();      
-
-  c1.SaveAs("w_munu.pdf");
+  TCanvas c("c", "W^{#pm} #rightarrow #mu + #nu_{#mu}", 1200, 800);
+  TString pdf_w = "w_munu.pdf";
+  c.Print(pdf_w + "[");
+  for (int i = 0; i < nPlots; ++i) {
+      c.Clear();
+      c.SetLogy(h_logs[i].logy ? 1 : 0);
+      h_logs[i].hist->Draw("HIST");
+      c.Update();
+      c.Print(pdf_w);
+  }
+  c.Print(pdf_w + "]");
 
   cout << "\nArquivo ROOT: w_munu.root" << endl;
   cout << "PDF gerado: w_munu.pdf" << endl;
-
   return 0;
 }

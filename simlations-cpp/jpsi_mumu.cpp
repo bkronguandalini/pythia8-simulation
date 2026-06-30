@@ -1,231 +1,132 @@
 // Desenvolvido por: Bruno Kron Guandalini
-// Descrição: Simulação de produção de J/ψ com decaimento em μ⁺μ⁻ usando o Pythia8 e ROOT.
+// Descrição: Simulação de produção de J/ψ com decaimento em μ⁺μ⁻ usando Pythia8 e ROOT.
 // Objetivo: Estudar as propriedades do J/ψ e seu decaimento em μ⁺μ⁻ a 13 TeV.
 
-#include "Pythia8/Pythia.h" // inclui a classe principal do Pythia
-#include "TH1D.h" // histogramas 1D do ROOT
-#include "TCanvas.h" // para desenhar os histogramas
-#include "TFile.h" // para salvar os histogramas em um arquivo ROOT
+#include "Pythia8/Pythia.h" // Biblioteca principal do Pythia8
+#include "TH1D.h" // Histograma unidimensional do ROOT
+#include "TCanvas.h" // Canvas para desenho do histograma
+#include "TFile.h" // Arquivo para salvar os dados
 
 using namespace Pythia8;
 
-// ================================================================
-// Classe para manipular o decaimento do J/ψ
-// ================================================================
-class JpsiDecay : public DecayHandler {
-private:
-  int nJpsiTotal;          // contador de decaimentos do J/ψ
-  ParticleData* pdtPtr;    // acesso à tabela de partículas
-  Rndm* rndmPtr;           // gerador de números aleatórios do Pythia
-
-// ================================================================
-// Implementação do decaimento J/ψ → μ⁺ μ⁻
-// ================================================================
-public:
-  // Construtor: guarda os ponteiros necessários
-  JpsiDecay(ParticleData* pdtPtrIn, Rndm* rndmPtrIn) {
-    nJpsiTotal = 0; // contador de decaimentos do J/ψ, começando em zero
-    pdtPtr = pdtPtrIn; // ponteiro para a tabela de partículas
-    rndmPtr = rndmPtrIn; // ponteiro para o gerador de números aleatórios
-  }
-
-  // Método chamado pelo Pythia sempre que um J/ψ precisa decair
-  bool decay(vector<int>& idProd, vector<double>& mProd,
-             vector<Vec4>& pProd, int iDec, const Event& evento);
-};
-
-// ----------------------------------------------------------------
-bool JpsiDecay::decay(vector<int>& idProd, vector<double>& mProd,
-                      vector<Vec4>& pProd, int iDec, const Event& evento) {
-
-// ================================================================
-// Implementação do decaimento J/ψ → μ⁺ μ⁻
-// ================================================================
-  // 1. Definir as partículas filhas μ⁺ e μ⁻ (PDG IDs -13 e 13)
-  idProd.push_back(-13);   // muon mais (μ⁺)
-  idProd.push_back(13);   // muon menos (μ⁻)
-
-  // 2. Massa dos muons, obtida da tabela de partículas (as duas têm a mesma massa)
-  double mMuon = pdtPtr->m0(13); // massa do muon (PDG ID 13)
-  mProd.push_back(mMuon); // massa do μ⁺
-  mProd.push_back(mMuon); // massa do μ⁻
-
-  // 3. Massa do J/ψ (obtida do evento)
-  double mJpsi = evento[iDec].m();
-
-  // 4. Cinemática no referencial de repouso do J/ψ
-  double eMuon = 0.5 * mJpsi;                     // energia de cada muon
-  double pMuon  = sqrt(eMuon*eMuon - mMuon*mMuon); // módulo do momento do muon
-
-  // 5. Ângulos isotrópicos para a direção do momento do μ⁺ 
-  double cosTheta = 2. * rndmPtr->flat() - 1.; // cos(θ) uniformemente distribuído em [-1, 1]
-  double sinTheta = sqrt(max(0., 1. - cosTheta*cosTheta)); // sin(θ) correspondente
-  double phi      = 2. * M_PI * rndmPtr->flat(); // φ uniformemente distribuído em [0, 2π]
-
-  // 6. Construção dos quadrivetores (px, py, pz, E) para μ⁺ e μ⁻
-  double px = pMuon * sinTheta * cos(phi); // componente x do momento
-  double py = pMuon * sinTheta * sin(phi); // componente y do momento
-  double pz = pMuon * cosTheta; // componente z do momento
-
-  // Criação dos quadrivetores para μ⁺ e μ⁻
-  Vec4 pMuPlus ( px,  py,  pz, eMuon);  // momento do μ⁺
-  Vec4 pMuMinus(-px, -py, -pz, eMuon);  // momento do μ⁻ (sentido oposto)
-
-  // Adiciona os quadrivetores à lista de produções
-  pProd.push_back(pMuPlus); // adiciona o μ⁺ à lista de produções
-  pProd.push_back(pMuMinus); // adiciona o μ⁻ à lista de produções
-
-  // 7. Mostra os primeiros 10 decaimentos
-  if (nJpsiTotal++ < 10) {
-    int iJpsi   = evento[iDec].mother1(); // índice J/ψ (particula mãe)
-    int idJpsi  = (iJpsi > 0) ? evento[iJpsi].id() : 0; // PDG ID J/ψ (particula mãe)
-    cout << "\n Decaimento J/psi #" << nJpsiTotal 
-         << " na linha " << iDec
-         << ", mae id = " << idJpsi << "\n";
-
-    // Mostra os quadrivetores no referencial do laboratório
-    Vec4 pJpsi = evento[iDec].p(); // quadrivetor da partícula mãe (J/ψ)
-    Vec4 muPlusLab  = pMuPlus;   muPlusLab.bst(pJpsi); // referencial do laboratório
-    Vec4 muMinusLab = pMuMinus;  muMinusLab.bst(pJpsi); // referencial do laboratório
-    cout << " μ⁺ pT = " << muPlusLab.pT()
-         << " GeV, η = " << muPlusLab.eta() << "\n";
-    cout << " μ⁻ pT = " << muMinusLab.pT()
-         << " GeV, η = " << muMinusLab.eta() << "\n";
-  }
-
-  return true;  // decaimento bem-sucedido
-}
-
-// ================================================================
-// Programa principal
-// ================================================================
 int main() {
-  // ---------- Parâmetros da simulação ----------
-  const int nEvent = 10000;   // número de eventos (altere conforme necessário)
-  const int nAbort = 5;       // falhas consecutivas permitidas
-
-  // Inicialização do Pythia (responsável por gerenciar toda a simulação)
+  // ================================================================
+  // 1. Configuração do Pythia e do processo de simulação
+  // ================================================================
   Pythia pythia;
-  
-  /* CONFIGURAÇÃO DA FÍSICA: 
-  A lógica aqui é preparar o Pythia para gerar especificamente o processo de produção de J/ψ seguido pelo decaimento em μ⁺μ⁻ */
-  pythia.readString("Charmonium:all = on");     // Ativa a produção de charmonium
-  pythia.readString("Beams:eCM = 13000.");        // Energia de 13 TeV no centro de massa (colisão padrão: pp)
-  pythia.readString("PhaseSpace:pTHatMin = 0.5"); // Este parâmetro atua apenas na geração do processo duro (pT mínimo), não substituindo cortes cinemáticos aplicados na análise.
 
-  // Instala o decaimento customizado J/ψ → μ⁺ μ⁻
-  DecayHandlerPtr handleDecays =
-      make_shared<JpsiDecay>(&pythia.particleData, &pythia.rndm);
-  vector<int> particulasManipuladas;
-  particulasManipuladas.push_back(443);  // PDG ID do J/ψ
-  pythia.setDecayPtr(handleDecays, particulasManipuladas);
+  // Configurações iniciais
+  pythia.readString("Beams:idA = 2212");      // Definição do próton (PDG 2212)
+  pythia.readString("Beams:idB = 2212");      // Definição do próton (PDG 2212)
+  pythia.readString("Beams:eCM = 13000.");    // Energia do centro de massa (13 TeV)
 
-    // Configuração da saída do Pythia (para evitar que o código fique muito difícil de ler e compreender por conta de muitas mensagens)
-  pythia.readString("Next:numberShowInfo = 0"); // Desativa a exibição de informações gerais sobre o processo
-  pythia.readString("Next:numberShowProcess = 0"); // Desativa a exibição de detalhes do processo de geração
-  pythia.readString("Next:numberShowEvent = 0"); // Desativa a exibição de detalhes de cada evento gerado
+  // Processo: produção de J/ψ via fusão glúon-glúon
+  pythia.readString("Charmonium:gg2ccbar(3S1)[3S1(1)]g = on");
+  pythia.readString("PhaseSpace:pTHatMin = 1.0"); // pT mínimo do processo duro
 
-  // Inicia o Pythia e verifica se houve erro na inicialização
+  // Força o decaimento do J/ψ apenas em μ⁺μ⁻
+  pythia.readString("443:onMode = off");      // desliga todos os canais de decaimento do J/ψ
+  pythia.readString("443:onIfAny = 13");      // ativa apenas canal com muon (PDG 13)
+
+  // Configuração da saída do Pythia (reduz mensagens na tela)
+  pythia.readString("Next:numberShowInfo = 0");
+  pythia.readString("Next:numberShowProcess = 0");
+  pythia.readString("Next:numberShowEvent = 0");
+
+  // Inicializa o gerador
   if (!pythia.init()) {
-    cout << "Erro na inicialização do Pythia!" << endl;
+    cerr << "Erro na inicialização do Pythia." << endl;
     return 1;
   }
 
-  cout << "Pythia inicializado com sucesso!" << endl;
+  // ================================================================
+  // 2. Configuração dos histogramas e dos arquivos de saída
+  // ================================================================
 
-  /* LÓGICA DOS HISTOGRAMAS:
-    Os histogramas servem para estudar os diferentes aspectos físicos do J/ψ e seu decaimento em μ⁺μ⁻. 
-    Cada histograma apresenta:
-     - Nome interno para o ROOT (sem espaços)
-     - Título para display (com formatação LaTeX com pequenas alterações) 
-     (substítuir \ por # e sempre que adicionar ^ colocar { } em seguida, isso no ROOT)
-     - Rótulos dos eixos (x e y)
-     - Número de bins e range */
-
-  // Cria um arquivo ROOT para armazenar os histogramas
   TFile outFile("jpsi_mumu.root", "RECREATE");
 
-  // Histograma da massa invariante μ⁺ μ⁻
-  TH1D h_mass_mumu("mass_mumu","Invariant Mass of #mu^{+}#mu^{-}; m_{#mu^{+}#mu^{-}} (GeV/c^{2}); Events", 80, 3.0, 3.2);
+  // Histograma da massa invariante dos pares μ⁺μ⁻
+  TH1D h_mass_mumu("h_mass_mumu", "Invariant Mass of #mu^{+}#mu^{-}; m_{#mu^{+}#mu^{-}} (GeV/c^{2}); Eventos", 80, 3.0, 3.2);
 
   // Histograma do momento transverso do J/ψ
-  TH1D h_pt_Jpsi("pt_Jpsi","Transverse Momentum of J/#psi; p_{T} (GeV); Events", 100, 0, 50);
-  
-  // Histograma da pseudorapidez do J/ψ
-  TH1D h_eta_Jpsi("eta_Jpsi","Pseudorapidity of J/#psi; #eta; Events", 100, -5, 5);
-  
+  TH1D h_pt_Jpsi("h_pt_Jpsi", "Transverse Momentum of J/#psi; p_{T} (GeV/c); Eventos", 100, 0., 50.);
+
+  // Histograma do pseudorapidez do J/ψ
+  TH1D h_eta_Jpsi("h_eta_Jpsi", "Pseudorapidity of J/#psi; #eta; Eventos", 100, -5., 5.);
+
   // Histograma do momento transverso dos muons
-  TH1D h_pt_muPlus("pt_muPlus","Transverse Momentum of #mu^{+}; p_{T} (GeV); Events", 100, 0, 25);
-  TH1D h_pt_muMinus("pt_muMinus","Transverse Momentum of #mu^{-}; p_{T} (GeV); Events", 100, 0, 25);
-  
-  // Histograma da pseudorapidez dos muons
-  TH1D h_eta_muPlus("eta_muPlus","Pseudorapidity of #mu^{+}; #eta; Events", 100, -5, 5);
-  TH1D h_eta_muMinus("eta_muMinus","Pseudorapidity of #mu^{-}; #eta; Events", 100, -5, 5);
-  
+  TH1D h_pt_muPlus("h_pt_muPlus", "Transverse Momentum of #mu^{+}; p_{T} (GeV/c); Eventos", 100, 0., 25.);
+  TH1D h_pt_muMinus("h_pt_muMinus", "Transverse Momentum of #mu^{-}; p_{T} (GeV/c); Eventos", 100, 0., 25.);
+
+  // Histograma do pseudorapidez dos muons
+  TH1D h_eta_muPlus("h_eta_muPlus", "Pseudorapidity of #mu^{+}; #eta; Eventos", 100, -5., 5.);
+  TH1D h_eta_muMinus("h_eta_muMinus", "Pseudorapidity of #mu^{-}; #eta; Eventos", 100, -5., 5.);
+
   // ================================================================
-  // Loop de eventos
+  // 3. Loop de geração de eventos e preenchimento dos histogramas
   // ================================================================
-  int iAbort = 0; // contador de falhas consecutivas na geração de eventos
-    for (int iEvent = 0; iEvent < nEvent; ++iEvent) {
-      if (!pythia.next()) {
-        if (++iAbort < nAbort) continue;
-        cerr << "Geracao abortada apos muitas falhas." << endl;
-        break;
-      }
+
+  const int nEvent = 10000; // Número de eventos a serem gerados (altere conforme necessário)
+  int nAbort = 5;  // Número máximo de falhas permitidas antes de abortar a geração
+  int iAbort = 0;  // Contador de falhas
+
+  for (int iEvent = 0; iEvent < nEvent; ++iEvent) {
+    if (!pythia.next()) {
+      if (++iAbort < nAbort) continue;
+      cerr << "Geração abortada após muitas falhas." << endl;
+      break;
+    }
+    iAbort = 0; // reseta o contador a cada evento bem-sucedido
 
     // Preenche os histogramas com os dados do evento
     for (int i = 0; i < pythia.event.size(); ++i) {
       int pid = pythia.event[i].id();
 
       // Preenche os histogramas de pT e η para J/ψ e μ⁺, μ⁻
-      if (pid == 443) {
+      if (pid == 443 && !pythia.event[i].isFinal()) {
         h_pt_Jpsi.Fill(pythia.event[i].pT());
         h_eta_Jpsi.Fill(pythia.event[i].eta());
       }
       // Preenche os histogramas de pT e η para μ⁺
-      else if (pid == -13) { 
+      else if (pid == -13 && pythia.event[i].isFinal()) {
         h_pt_muPlus.Fill(pythia.event[i].pT());
         h_eta_muPlus.Fill(pythia.event[i].eta());
       }
       // Preenche os histogramas de pT e η para μ⁻
-      else if (pid == 13) {   
+      else if (pid == 13 && pythia.event[i].isFinal()) {
         h_pt_muMinus.Fill(pythia.event[i].pT());
         h_eta_muMinus.Fill(pythia.event[i].eta());
       }
     }
 
-    // Massa invariante μ⁺ μ⁻ apenas do decaimento do J/ψ
+    // Procura o J/ψ (PDG = 443) que decaiu e suas filhas (μ⁺ e μ⁻)
     for (int i = 0; i < pythia.event.size(); ++i) {
-      if (pythia.event[i].id() == 443 && pythia.event[i].isFinal()) {
-        int d1 = pythia.event[i].daughter1(); // índice da primeira filha (μ⁺)
-        int d2 = pythia.event[i].daughter2(); // índice da segunda filha (μ⁻)
+      if (pythia.event[i].id() == 443) {  // J/ψ encontrado
+        int d1 = pythia.event[i].daughter1(); // Índice da primeira filha
+        int d2 = pythia.event[i].daughter2(); // Índice da segunda filha
 
-        // Verifica se as filhas são realmente μ⁺ e μ⁻ antes de calcular a massa invariante
         if (d1 > 0 && d2 > 0 &&
             abs(pythia.event[d1].id()) == 13 &&
             abs(pythia.event[d2].id()) == 13) {
-          Vec4 pSum = pythia.event[d1].p() + pythia.event[d2].p(); // soma dos quadrivetores das duas filhas
-          double massa = pSum.mCalc(); // calcula (soma) a massa invariante das duas filhas
-          h_mass_mumu.Fill(massa); // preenche o histograma da massa invariante
+          Vec4 pSum = pythia.event[d1].p() + pythia.event[d2].p();
+          double massa = pSum.mCalc(); // Calcula a massa do par μ⁺μ⁻
+          h_mass_mumu.Fill(massa);     // Preenche o histograma da massa invariante
         }
       }
     }
-  } // fim do loop de eventos
+  }
 
-  // Finalização
-  pythia.stat(); // estatísticas do Pythia
-  outFile.Write(); // escreve os histogramas no arquivo ROOT
-  outFile.Close(); // fecha o arquivo ROOT
+  // ---------- Finalização ----------
+  pythia.stat();   // Exibe estatísticas da simulação
+  outFile.Write(); // Escreve os histogramas no arquivo ROOT
+  outFile.Close(); // Fecha o arquivo
 
-  // ===============================================================
-  // Desenha os histogramas usando o ROOT e salva em um arquivo PDF
-  // ===============================================================
+  // ==================================================================
+  // 4. PDF multipágina
+  // ==================================================================
 
-  TCanvas c1("c1", "J/psi #rightarrow #mu^{+}#mu^{-}", 1200, 800);
-  c1.Divide(3, 3);
-
-  // Cores para diferenciar os histogramas de cada partícula (constantes do ROOT) 
-  h_mass_mumu.SetLineColor(kBlue); 
+  // Cores
+  h_mass_mumu.SetLineColor(kBlue);
   h_pt_Jpsi.SetLineColor(kBlue);
   h_eta_Jpsi.SetLineColor(kBlue);
   h_pt_muPlus.SetLineColor(kRed);
@@ -233,34 +134,37 @@ int main() {
   h_eta_muPlus.SetLineColor(kRed);
   h_eta_muMinus.SetLineColor(kGreen+2);
 
-  // Desenha os histogramas em cada subcanvas
+  // Estrutura auxiliar para agrupar histograma + flag de escala log
+  struct Plot {
+      TH1D* hist;
+      bool logy;
+  };
 
-  // Massa invariante
-  c1.cd(1); h_mass_mumu.Draw();
+  Plot h_logs[] = {
+      {&h_mass_mumu, false},
+      {&h_pt_Jpsi,   true},
+      {&h_eta_Jpsi,  false},
+      {&h_pt_muPlus, true},
+      {&h_pt_muMinus,true},
+      {&h_eta_muPlus,false},
+      {&h_eta_muMinus,false}
+  };
+  int nPlots = sizeof(h_logs) / sizeof(h_logs[0]);
 
-  // Momento Transverso (pT) do J/ψ (escala log)
-  c1.cd(2); gPad->SetLogy(1);
-  h_pt_Jpsi.Draw();
+  // Canvas único e PDF
+  TCanvas c("c", "J/#psi #rightarrow #mu^{+}#mu^{-}", 1200, 800);
+  TString pdf_jpsi = "jpsi_mumu.pdf";
+  c.Print(pdf_jpsi + "[");   // inicia o PDF multipágina
 
-  // Pseudorapidez (η) do J/ψ (linear)
-  c1.cd(3); h_eta_Jpsi.Draw();
+  for (int i = 0; i < nPlots; ++i) {
+      c.Clear();
+      c.SetLogy(h_logs[i].logy ? 1 : 0);
+      h_logs[i].hist->Draw("HIST");
+      c.Update();
+      c.Print(pdf_jpsi);
+  }
 
-  // Momento Transverso (pT) do μ⁺ (escala log)
-  c1.cd(4); gPad->SetLogy(1);
-  h_pt_muPlus.Draw();
-
-  // Momento Transverso (pT) do μ⁻ (escala log)
-  c1.cd(5); gPad->SetLogy(1);
-  h_pt_muMinus.Draw();
-
-  // Pseudorapidez (η) do μ⁺ 
-  c1.cd(6); h_eta_muPlus.Draw();
-
-  // Pseudorapidez (η) do μ⁻
-  c1.cd(7); h_eta_muMinus.Draw();
-
-  // Salva o canvas com os histogramas em um arquivo PDF
-  c1.SaveAs("jpsi_mumu.pdf");
+  c.Print(pdf_jpsi + "]");   // finaliza o PDF
 
   cout << "\nArquivo ROOT: jpsi_mumu.root" << endl;
   cout << "PDF gerado: jpsi_mumu.pdf" << endl;

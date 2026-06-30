@@ -18,6 +18,7 @@ Step-by-step tutorial for installing PYTHIA8 with ROOT support on Linux systems 
 1. [Introduction](#1-introduction)
 2. [Prerequisites](#2-prerequisites)
 3. [C++ Interface](#3-c-interface)
+   <!--
    - [3.1 Installing Miniconda](#31-installing-miniconda)
    - [3.2 Creating the ROOT environment](#32-creating-the-conda-environment-with-root)
    - [3.3 Installing PYTHIA8](#33-installing-pythia8)
@@ -34,15 +35,17 @@ Step-by-step tutorial for installing PYTHIA8 with ROOT support on Linux systems 
       - [3.6.1 Edit the configuration file](#361-edit-the-configuration-file)
       - [3.6.2 Add the shortcuts](#362-add-the-shortcuts)
       - [3.6.3 Reload the configurations](#363-reload-the-configurations)
-      - [3.6.4 Use the shortcut](#364-use-the-shortcut)
+      - [3.6.4 Use the shortcut](#364-use-the-shortcut) -->
 4. [Python Interface](#4-python-interface)
+   <!--
    - [4.1 Creating a clean Conda environment](#41-creating-a-clean-conda-environment)
    - [4.2 Installing PYTHIA8 and ROOT via conda-forge](#42-installing-pythia8-and-root-via-conda-forge)
    - [4.3 Running a script](#43-running-a-script)
-   - [4.4 Quick library check (Optional)](#44-quick-library-check-optional)
+   - [4.4 Quick library check (Optional)](#44-quick-library-check-optional) -->
 5. [Troubleshooting](#5-troubleshooting)
+   <!--
    - [5.1 C++](#51-c)
-   - [5.2 Python](#52-python)
+   - [5.2 Python](#52-python) -->
 6. [References](#6-references)
 ---
 
